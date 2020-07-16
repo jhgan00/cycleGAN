@@ -14,10 +14,10 @@ def generator_loss(generated):
 
 
 def cycle_loss(real_image, cycled_image, LAMBDA=10):
-    loss = mean_absolute_error(real_image, cycled_image)
+    loss = tf.math.reduce_mean(tf.math.abs(real_image - cycled_image))
     return loss * LAMBDA
 
 
 def identity_loss(real_image, same_image, LAMBDA=10):
-    loss = mean_absolute_error(real_image, same_image)
+    loss = tf.math.reduce_mean(tf.math.abs(real_image - same_image))
     return loss * LAMBDA * 0.5
