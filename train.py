@@ -87,15 +87,15 @@ def train(max_epochs=100, tensorboard_path="logs/train"):
         train_summary_writer = tf.summary.create_file_writer(tensorboard_path)
 
         with train_summary_writer.as_default():
-            tf.summary.scalar("G_loss", gen_g_loss)
-            tf.summary.scalar("F_loss", gen_f_loss)
-            tf.summary.scalar("Dx_loss", disc_x_loss)
-            tf.summary.scalar("Dy_loss", disc_y_loss)
+            tf.summary.scalar("G_loss", G_loss)
+            tf.summary.scalar("F_loss", F_loss)
+            tf.summary.scalar("Dx_loss", Dx_loss)
+            tf.summary.scalar("Dy_loss", Dy_loss)
             tf.summary.image("Fake Real Image", fake_x)
             tf.summary_image("Fake Tattoo Image", fake_y)
 
         print(
-            f"EPOCH: {epoch + 1}  L(G): {gen_g_loss.numpy().round(3)}  L(F): {gen_f_loss.numpy().round(3)}  L(Dx): {disc_x_loss.numpy().round(3)}  L(Dy): {gen_y_loss.numpy().round(3)}")
+            f"EPOCH: {epoch + 1}  L(G): {G_loss.numpy().round(3)}  L(F): {F_loss.numpy().round(3)}  L(Dx): {Dx_loss.numpy().round(3)}  L(Dy): {Dy_loss.numpy().round(3)}")
 
         if (epoch + 1) % 5 == 0:
             ckpt_save_path = ckpt_manager.save()
