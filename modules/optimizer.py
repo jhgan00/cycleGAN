@@ -1,7 +1,7 @@
 from tensorflow.keras.optimizers import Adam
 
-gen_G_optimizer = Adam(2e-4, beta_1=0.5)
-gen_F_optimizer = Adam(2e-4, beta_1=0.5)
+generator_g_optimizer = Adam(2e-4, beta_1=0.5)
+generator_f_optimizer = Adam(2e-4, beta_1=0.5)
 
-disc_X_optimizer = Adam(2e-4, beta_1=0.5)
-disc_Y_optimizer = Adam(2e-4, beta_1=0.5)
+discriminator_x_optimizer = Adam(2e-4, beta_1=0.5)
+discriminator_y_optimizer = Adam(2e-4, beta_1=0.5)
