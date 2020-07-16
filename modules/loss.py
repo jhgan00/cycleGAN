@@ -1,20 +1,23 @@
 import tensorflow as tf
-LAMBDA = 10
-loss_obj = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+from tensorflow.keras.losses import mean_squared_error, mean_absolute_error
+
 
 def discriminator_loss(real, generated):
-    real_loss = loss_obj(tf.ones_like(real), real)
-    generated_loss = loss_obj(tf.zeros_like(generated), generated)
-    disc_loss = (real_loss + generated_loss) * .5
-    return disc_loss
+    real_loss = mean_squared_error(tf.ones_like(real), real)
+    generated_loss = mean_squared_error(tf.zeros_like(generated), generated)
+    total_disc_loss = real_loss + generated_loss
+    return total_disc_loss * 0.5
+
 
 def generator_loss(generated):
-    return loss_obj(tf.ones_like(generated), generated)
+    return mean_squared_error(tf.ones_like(generated), generated)
 
-def cycle_loss(real_image, cycled_image):
-    loss1 = tf.math.reduce_mean(tf.math.abs(real_image, cycled_image))
-    return LAMBDA * loss1
 
-def identity_loss(real_image, same_image):
-    loss = tf.math.reduce_mean(tf.math.abs(real_image - same_image))
-    return LAMBDA * 0.5 * loss
+def cycle_loss(real_image, cycled_image, LAMBDA=10):
+    loss = mean_absolute_error(real_image, cycled_image)
+    return loss * LAMBDA
+
+
+def identity_loss(real_image, same_image, LAMBDA=10):
+    loss = mean_absolute_error(real_image, same_image)
+    return loss * LAMBDA * 0.5
