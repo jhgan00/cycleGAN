@@ -1,8 +1,9 @@
+import tensorflow as tf
 from tensorflow.train import Checkpoint, CheckpointManager
-from models import *
-from optimizers import *
+from modules.model import *
+from modules.optimizer import *
 
-CKPT_PATH = "./checkpoints/train"
+checkpoint_path = "./checkpoints/train"
 ckpt = tf.train.Checkpoint(
     generator_g=generator_g,
     generator_f=generator_f,
