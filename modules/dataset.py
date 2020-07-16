@@ -1,58 +1,47 @@
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.data import Dataset
 
-BUFFER_SIZE = 128
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 WIDTH = 256
 HEIGHT = 256
+AUTOTUNE = tf.data.experimental.AUTOTUNE
+
+
+def decode_img(img):
+    # convert the compressed string to a 3D uint8 tensor
+    img = tf.image.decode_jpeg(img, channels=3)
+    # resize the image to the desired size
+    img = tf.image.resize(img, [286, 286], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+    return img
+
+
+def process_path(file_path):
+    # load the raw data from the file as a string
+    img = tf.io.read_file(file_path)
+    img = decode_img(img)
+    return img
+
 
 def random_crop(image):
     return tf.image.random_crop(image, size=[HEIGHT, WIDTH, 3])
 
-def normalize(image):
-    return (tf.cast(image, tf.float32) / 127.5 ) - 1
 
 def random_jitter(image):
-    image = tf.image.resize(image, [286, 286], method = tf.image.ResizeMethod.NEAREST_NEIGHBOR)
     image = random_crop(image)
     image = tf.image.random_flip_left_right(image)
     return image
 
-def preprocess_image_train(image):
-    image = random_jitter(image)
-    image = normalize(image)
-    return image
 
-def preprocess_image_test(image):
-    image = normalize(image)
-    return image
+def normalize(image):
+    return (tf.cast(image, tf.float32) / 127.5) - 1
 
-def build_generator(path, batch_size=32, class_mode=None):
-    datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_image_train,
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        channel_shift_range=0.2,
-        vertical_flip=True
-    )
-    generator = datagen.flow_from_directory(
-        path,
-        class_mode=class_mode,
-        batch_size=batch_size
-    )
-    return generator
 
-real_dataset = tf.data.Dataset.from_generator(
-    lambda: build_generator("./sample/real-world"),
-    output_types=tf.float32,
-    output_shapes=[32, 256, 256, 3]
-)
+real_dataset = Dataset.list_files("sample/real-world/*") \
+    .map(process_path, num_parallel_calls=AUTOTUNE) \
+    .map(random_jitter, num_parallel_calls=AUTOTUNE) \
+    .map(normalize, num_parallel_calls=AUTOTUNE).batch(BATCH_SIZE)
 
-tattoo_dataset = tf.data.Dataset.from_generator(
-    lambda: build_generator("./sample/tattoo"),
-    output_types=tf.float32,
-    output_shapes=[32, 256, 256, 3]
-)
+tattoo_dataset = Dataset.list_files("sample/tattoo/*") \
+    .map(process_path, num_parallel_calls=AUTOTUNE) \
+    .map(random_jitter, num_parallel_calls=AUTOTUNE) \
+    .map(normalize, num_parallel_calls=AUTOTUNE).batch(BATCH_SIZE)
