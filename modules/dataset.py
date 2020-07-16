@@ -27,7 +27,7 @@ def preprocess_image_test(image):
     image = normalize(image)
     return image
 
-def build_generator(path, batch_size=32, class_mode="input"):
+def build_generator(path, batch_size=32, class_mode=None):
     datagen = ImageDataGenerator(
         preprocessing_function=preprocess_image_train,
         rotation_range=20,
@@ -45,8 +45,14 @@ def build_generator(path, batch_size=32, class_mode="input"):
     )
     return generator
 
-real_dataset = tf.data.Dataset.from_generator(lambda: build_generator("./sample/real-world"), tf.float32)\
-    .cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+real_dataset = tf.data.Dataset.from_generator(
+    lambda: build_generator("./sample/real-world"),
+    output_types=tf.float32,
+    output_shapes=[32, 256, 256, 3]
+)
 
-tattoo_dataset = tf.data.Dataset.from_generator(lambda: tattoo_generator("./sample/tattoo"), tf.float32)\
-    .cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+tattoo_dataset = tf.data.Dataset.from_generator(
+    lambda: build_generator("./sample/tattoo"),
+    output_types=tf.float32,
+    output_shapes=[32, 256, 256, 3]
+)
