@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.data import Dataset
 
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 WIDTH = 256
 HEIGHT = 256
 AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -36,12 +36,12 @@ def normalize(image):
     return (tf.cast(image, tf.float32) / 127.5) - 1
 
 
-real_dataset = Dataset.list_files("sample/real-world/*") \
+real_dataset = Dataset.list_files("data/real-world/*") \
     .map(process_path, num_parallel_calls=AUTOTUNE) \
     .map(random_jitter, num_parallel_calls=AUTOTUNE) \
     .map(normalize, num_parallel_calls=AUTOTUNE).batch(BATCH_SIZE)
 
-tattoo_dataset = Dataset.list_files("sample/tattoo/*") \
+tattoo_dataset = Dataset.list_files("data/tattoo/*") \
     .map(process_path, num_parallel_calls=AUTOTUNE) \
     .map(random_jitter, num_parallel_calls=AUTOTUNE) \
     .map(normalize, num_parallel_calls=AUTOTUNE).batch(BATCH_SIZE)
